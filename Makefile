@@ -1,10 +1,14 @@
-.PHONY: all clean dynamics master server watchdog run
+.PHONY: all clean directories dynamics master server watchdog run
 
-all: clean dynamics master server watchdog
+all: clean directories dynamics master server watchdog
 
 clean:
-	$(RM) bin/*
-	$(RM) logs/*
+	@rm -rf bin
+	@rm -rf logs
+
+directories: 
+	mkdir bin
+	mkdir logs
 
 master: 
 	g++ src/master.cpp -lncurses -lm -lrt -lpthread -o bin/master 
