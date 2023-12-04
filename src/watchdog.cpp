@@ -15,9 +15,23 @@
 #define SEM_PATH_1 "/sem_PID_1"
 #define SEM_PATH_2 "/sem_PID_2"
 #define MAX_PIDS 2
+#define MAX_RETRIES 3  // Maximum number of retries for sending the signal
 
 pid_t *pid_array;
 
+int sendSignal(pid_t target_pid, FILE *file) {
+    if (kill(target_pid, SIGUSR1) == 0) {
+        printf("Signal successfully sent to process with PID %d\n", target_pid);
+
+        // Log that the targeted process is working
+        fprintf(file, "Signal sent to process with PID %d. Process with PID %d is working.\n", target_pid, target_pid);
+
+        return 0;  // Signal sent successfully
+    } else {
+        perror("function: Error sending signal");
+        return -1;  // Failed to send signal
+    }
+}
 
 int main() {
     // Create or open a shared memory object for PIDs
@@ -30,7 +44,7 @@ int main() {
     // Open semaphores
     sem_t *sem_id1 = sem_open(SEM_PATH_1, 0);
     sem_t *sem_id2 = sem_open(SEM_PATH_2, 0);
-    
+
     /* Wait for Master to write */
     sem_wait(sem_id2);
     printf("Watchdog !\n");
@@ -48,62 +62,72 @@ int main() {
     }
     fflush(stdout);
 
-     /* Restart writer */
+    /* Restart writer */
     sem_post(sem_id1);
 
     // Close the shared memory object for PIDs (not unlinking yet)
     if (close(shm_fd_pids) == -1) {
         perror("close failed");
         return -1;
-    } 
+    }
 
-    const char *filename = "WD_log.txt";  
+    const char *filename = "WD_log.txt";
     bool brk = false;
 
-   while (1) {
+    FILE *file = fopen(filename, "a");
+    if (file == NULL) {
+        perror("Error opening file for writing");
+        return -1;
+    }
 
-    sleep(5);
+    while (1) {
+        sleep(5);
 
-    for (int i = 0; i < MAX_PIDS; i++) {
-        pid_t target_pid = pid_array[i];  // Get the PID of the target process
+        for (int i = 0; i < MAX_PIDS; i++) {
+            pid_t target_pid = pid_array[i];  // Get the PID of the target process
 
-        if (kill(target_pid, SIGUSR1) == 0) {
-            printf("Signal successfully sent to process with PID %d\n", target_pid);
-
-            // Log that the targeted process is working
-            FILE *file = fopen("WD_log.txt", "a");
-            if (file != NULL) {
-                fprintf(file, " Signal sent to process with PID %d.Process with PID %d is working.\n", target_pid, target_pid);
-                fclose(file);
+            if (sendSignal(target_pid, file) == 0) {
+                // Signal sent successfully, continue with the next target
             } else {
-                perror("Error opening file for writing");
-            }
-        } else {
-            perror("Error sending signal");
-            printf("Process with PID %d is not responding.\n", target_pid);
-            brk = true;
+                // Failed to send signal on the first attempt, retry multiple times
+                fprintf(file, "Retrying to send signal to process with PID %d\n", target_pid);
+                printf("Retrying to send signal to process with PID %d\n", target_pid);
 
-            // Perform cleanup actions, as in your original code
+                for (int retry = 0; retry < MAX_RETRIES; retry++) {
+                    if (sendSignal(target_pid, file) == 0) {
+                        // Signal sent successfully, break out of the retry loop
+                        fprintf(file, "Signal successfully sent to process with PID %d after retry.\n", target_pid);
+                        printf("Signal successfully sent to process with PID %d after retry.\n", target_pid);
+                        break;
+                    }
+
+                    // Sleep for a short duration before the next retry
+                    sleep(2);
+                }
+
+                // If still not successful after retries, terminate everything
+                fprintf(file, "Process with PID %d is not responding after multiple attempts.\n", target_pid);
+                printf("Process with PID %d is not responding after multiple attempts.\n", target_pid);
+                brk = true;
+                break;  // Break out of the loop and terminate everything
+            }
+        }
+
+        if (brk) {
+            // Perform cleanup actions
             for (int j = 0; j < MAX_PIDS; j++) {
                 if (kill(pid_array[j], SIGKILL) == 0) {
                     printf("Sending a SIGKILL to all processes.\n");
                 }
             }
 
-            FILE *file = fopen("WD_log.txt", "a");
-            if (file != NULL) {
-                fprintf(file, "Process with PID %d is not responding.\n", target_pid);
-                fprintf(file, "ALL PROCESSES ARE TERMINATED.\n");
-                fclose(file);
-                break;
-            } else {
-                perror("Error opening file for writing");
-            }
+            fprintf(file, "ALL PROCESSES ARE TERMINATED.\n");
+
+            break;  // Break out of the main loop
         }
     }
-    if(brk)
-        break;
-}
+
+    fclose(file);  // Close the file outside the loop
 
     // Unmap the shared memory for PIDs
     if (munmap(pid_array, MAX_PIDS * sizeof(pid_t)) == -1) {

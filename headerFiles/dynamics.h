@@ -153,11 +153,9 @@ void drone_movement(int key, Drone *drone) {
             endwin();
             exit(0);
         case 'i':
-            // printw("I changed the force TO GO UP \n");
             drone->fy -= FORCE;
             break;
         case 'j':
-            // printw("I changed the force TO GO DOWN \n");
             drone->fx -= FORCE;
             break;
         case ',':
