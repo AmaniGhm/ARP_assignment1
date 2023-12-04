@@ -5,6 +5,13 @@ Lidia LOUBAR ID: 5989908
 Amani GHOMRANI ID: 6237068  
 ## User Manual and Documentation:
 ### User Manual:
+#### Drone movement:
+To move the drone use the following keyset :
+
+      u  i  o
+      j  k  l
+      n  m  ,
+     
 #### Requirements:
 To install the ncurses library, simply open a terminal and type the following command:
 ```console
