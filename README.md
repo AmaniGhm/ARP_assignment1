@@ -44,16 +44,16 @@ After compiling the program other two directories will be created:
 - the `Logs` folder will contain all the log files.
 ## Processes
 The program is composed of 4 processes:
-# master.cpp
+### master.cpp
 - The first process launched
 - Responsible for initiating other processes except for the `watchdog`
-# dynamics.cpp
+### dynamics.cpp
 - Controls the dynamics of the drone within the system.
 - Continuously updates the drone's position based on user input, communicating this information with the `server`.
-# server.cpp
+###  server.cpp
 - Manages shared memory for drone position.
 - Logs drone position updates with timestamps.
-# watchdog.cpp
+### watchdog.cpp
 - Monitors process execution by sending signals every 5 seconds.
 - Resends signals multiple times if not received.
 - Terminates all processes if signals are consistently not received.
