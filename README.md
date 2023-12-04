@@ -42,11 +42,8 @@ After compiling the program other two directories will be created:
 - the `Logs` folder will contain all the log files.
 ![plot](./images/tree.png)
 ## Processes
-The program is composed of 6 processes:
-- `master.cpp` is the first process to be executed and it takes care of launching all the other processes. In case one of them terminates unexpectedly it prints the status to the screen, when ctrl+c is pressed the master process will kill all the processes and terminate.
-- `command_console.c` creates a window where you can send commands to the two motors, using a ncurses GUI
-- `M1.cpp` is the process related to the motor that makes the hoist move in the x-axis and it listens for commands sent by the command window, computes the new x component of the position, and sends the data to `RW.cpp`
-- `M2.cpp` does the same thing as `M1.cpp` for the y-axis.
-- `RW.cpp` gets the position from the two motors processes and applies a 5% random error to the measurement, to better simulate error accumulations in the real case scenarios, and send the position to the `inspection_console.c` process
-- `inspection_console.c` gets the position from the `RW.cpp` process and displays the hoist on a window, using ncurses GUI. 
-- `WatchDog.cpp` monitors the execution of the process, if there is no activity for 60s, it resets the hoist position.
+The program is composed of 4 processes:
+- `master.cpp` is the first process to be executed and it takes care of launching all the other processes, except the `watchdog`.
+- `dynamics.cpp` 
+- `server.cpp`
+- `watchdog.cpp` monitors the execution of the process by sending signals each 5 seconds, if the signals is not received it resends it multiple times , if the process is still not receiving it it terminates everything 
