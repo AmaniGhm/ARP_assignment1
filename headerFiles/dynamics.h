@@ -149,56 +149,44 @@ void draw_drone(int x, int y) {
 void drone_movement(int key, Drone *drone) {
 
     switch (key) {
-        case 'q':
+        case 'q': /* key to quite the terminal */
             endwin();
             exit(0);
-        case 'i':
-            // printw("I changed the force TO GO UP \n");
+        case 'i': /* key to move the drone up */
             drone->fy -= FORCE;
             break;
-        case 'j':
-            // printw("I changed the force TO GO DOWN \n");
+        case 'j': /* key to move the drone left */
             drone->fx -= FORCE;
             break;
-        case ',':
+        case 'm': /* key to move the drone down */
             drone->fy += FORCE;
             break;
-        case 'l':
+        case 'l': /* key to move the drone right */
             drone->fx += FORCE;
             break;
-        case 'u':
-
-            // if (drone->fx >= drone->fy) drone->fy = drone->fx;
-            // else if(drone->fy > drone->fx) drone->fx = drone->fy;
+        case 'u': /* key to move the drone diagonally to upper left */
             drone->fx -= FORCE ;
             drone->fy -= FORCE ;
 
             break;
-        case 'o':
-            // if (drone->fx >= drone->fy) drone->fy = drone->fx;
-            // else if(drone->fy > drone->fx) drone->fx = drone->fy;
+        case 'o': /* key to move the drone diagonally to upper right */
             drone->fx += FORCE ;
             drone->fy -= FORCE ;
             break;
-        case 'n':
-            // if (drone->fx >= drone->fy) drone->fy = drone->fx;
-            // else if(drone->fy > drone->fx) drone->fx = drone->fy;
+        case 'n': /* key to move the drone diagonally to lower left */
             drone->fx -= FORCE ;
             drone->fy += FORCE ;
             break;
-        case ';':
-            
-            // if (drone->fx >= drone->fy) drone->fy = drone->fx;
-            // else if(drone->fy > drone->fx) drone->fx = drone->fy;
+        case ',': /* key to move the drone diagonally to lower right */
             drone->fx += FORCE ;
             drone->fy += FORCE ;
             break;
-        case 'k':
+        case 'k': /* key hit the breaks */
             drone->fx = 0 ;
             drone->fy = 0 ;
             break;
 
-        case 'a':
+        case 'a': /* key put the drone to the initial position y = 0 , x = 0 */
             init_drone(drone);
             break;
     }

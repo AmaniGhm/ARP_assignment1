@@ -1,15 +1,6 @@
 
 #include "./../headerFiles/dynamics.h"
 
-/*         Prototypes         */
-void handler_dyn(int sig, siginfo_t *info, void *context);
-void init_ncurses();
-void init_drone(Drone *drone);
-void draw_window();
-void draw_drone(int x, int y);
-void drone_movement(int key, Drone *drone);
-void write_data_to_shm(Drone *drone, sem_t *sem_id1, sem_t *sem_id2);
-
 
 int main() {
     srand(time(NULL));
