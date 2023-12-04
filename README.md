@@ -40,7 +40,6 @@ After compiling the program other two directories will be created:
 
 - the `bin` folder contains all the executable files
 - the `Logs` folder will contain all the log files.
-![plot](./images/tree.png)
 ## Processes
 The program is composed of 4 processes:
 - `master.cpp` is the first process to be executed and it takes care of launching all the other processes, except the `watchdog`.
