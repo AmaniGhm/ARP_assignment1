@@ -71,7 +71,7 @@ int main() {
         return -1;
     }
 
-    const char *filename = "WD_log.txt";
+    const char *filename = "./logs/WD_log.txt";
     bool brk = false;
 
     FILE *file = fopen(filename, "a");
@@ -81,7 +81,7 @@ int main() {
     }
 
     while (1) {
-        sleep(5);
+        sleep(1);
 
         for (int i = 0; i < MAX_PIDS; i++) {
             pid_t target_pid = pid_array[i];  // Get the PID of the target process
@@ -102,7 +102,7 @@ int main() {
                     }
 
                     // Sleep for a short duration before the next retry
-                    sleep(2);
+                    usleep(100);
                 }
 
                 // If still not successful after retries, terminate everything
